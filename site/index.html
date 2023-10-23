@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Cal</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="css/index.css" rel="stylesheet" />
+  </head>
+
+  <body>
+    <div class="terminal">
+      <div class="terminal-header"></div>
+      <div class="terminal-body"></div>
+      <div class="terminal-contents"></div>
+      <div class="terminal-text"></div>
+    </div>
+  </body>
+</html>
+<script>
+  var textFile = new XMLHttpRequest();
+  textFile.open("GET", "header.txt", true);
+  textFile.onreadystatechange = function () {
+    if (textFile.readyState == 4 && textFile.status == 200) {
+      var terminalHeaders = document.getElementsByClassName("terminal-body");
+      var textContent = textFile.responseText;
+      for (var i = 0; i < terminalHeaders.length; i++) {
+        textContent = textContent.replace(/ /g, "&nbsp;");
+        textContent = textContent.replace(/\n/g, "<br>");
+        terminalHeaders[i].innerHTML = textContent;
+      }
+    }
+  };
+  textFile.send();
+
+  var finalContent;
+  const terminalText = "guest@cal.wtf:~$ ";
+
+  function createLineAbove(name, finalContent) {
+    var contentBody = document.getElementsByClassName("terminal-contents")[0];
+    var line = document.createElement("div");
+    line.className = name;
+    line.textContent = terminalText;
+    var aboveLineInput = document.createElement("span");
+    aboveLineInput.className = "terminal-input";
+    aboveLineInput.contentEditable = false;
+    aboveLineInput.textContent = finalContent.toString();
+    contentBody.appendChild(line);
+    line.appendChild(aboveLineInput);
+  }
+
+  function createLine(name) {
+    var textBody = document.getElementsByClassName("terminal-text")[0];
+    console.log(textBody);
+    var line = document.createElement("div");
+    line.className = name;
+    line.textContent = terminalText;
+    var lineInput = document.createElement("span");
+
+    lineInput.className = "terminal-input";
+    lineInput.contentEditable = true;
+    textBody.appendChild(line);
+    textBody.appendChild(lineInput);
+    lineInput.addEventListener("click", function (e) {
+      e.preventDefault();
+      lineInput.focus();
+    });
+
+    lineInput.addEventListener("input", function () {
+      var editedContent = this.textContent;
+
+      console.log("Edited content: " + editedContent);
+    });
+  }
+  function createResponseLine(text) {
+    var contentBody = document.getElementsByClassName("terminal-contents")[0];
+    var line = document.createElement("div");
+    line.className = "terminal-response";
+    line.innerHTML = text;
+    contentBody.appendChild(line);
+  }
+
+  createLine("terminal-text");
+  const cmd = [];
+
+  let lineInput = document.getElementsByClassName("terminal-input")[0];
+  lineInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      console.log("enter");
+      var finalContent = this.textContent;
+      console.log(finalContent);
+      createLineAbove("terminal-text", finalContent);
+      this.textContent = "";
+      //switch statement
+      switch (finalContent) {
+        case "help":
+          createResponseLine("help");
+          createResponseLine("about");
+          createResponseLine("projects");
+          createResponseLine("contact");
+          break;
+        case "whoami":
+          createResponseLine(
+            "Hello!👋\nMy name is cal, I'm a computer science student in York, England,\ncurrently in my 2nd year of study."
+          );
+          break;
+        case "projects":
+          createResponseLine("projects");
+          break;
+        case "contact":
+          createResponseLine("email: callumburnsoregan@gmail.com");
+          createResponseLine("github: https://github.com/CalRL");
+          createResponseLine("discord: caldev");
+          break;
+        default:
+          createResponseLine(
+            '<div>command not found type <span class="command">"help"</span> for a list of commands</div>'
+          );
+      }
+
+      //lineInput.blur();
+      //createLine("terminal-text");
+      //lineInput.focus();
+    }
+  });
+</script>
